@@ -1,0 +1,24 @@
+import requests
+from bs4 import BeautifulSoup
+import pandas as pd
+from collections import OrderedDict
+
+url="https://www.fifa.com/fifa-world-ranking/ranking-table/men/"
+
+res=requests.get(url)
+soup=BeautifulSoup(res.content,'html.parser')
+
+d=OrderedDict()
+
+index=soup.find_all('td', class_='fi-table__td fi-table__rank')
+idx=[index.span.text for index in index]
+
+country=soup.find_all('span', class_='fi-t__nText')
+d['county']=[country.text for country in country]
+
+points=soup.find_all('td', class_='fi-table__td fi-table__points')
+d['points']=[points.text for points in points]
+
+df=pd.DataFrame(d, index=idx)
+
+df.head(5)
