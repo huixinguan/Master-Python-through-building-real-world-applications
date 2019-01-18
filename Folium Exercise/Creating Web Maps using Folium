@@ -1,0 +1,32 @@
+import folium
+import pandas as pd
+from folium.plugins import MarkerCluster
+
+
+map = folium.Map(location=[40.758896, -73.985130], zoom_start=3,tiles = "CartoDB dark_matter")
+marker_cluster = MarkerCluster().add_to(map)
+
+data = pd.read_csv('Volcanoes.txt')
+lon = data['LON']
+lat = data['LAT']
+elev = data['ELEV']
+name = data['NAME']
+status = data['STATUS']
+
+def color_icon(elev):
+    if elev<1500:
+        return 'orange'
+    elif elev>=1500 and elev<2500:
+        return 'red'
+    else:
+        return 'green'
+
+for lon, lat, elev, name, status in zip(lon, lat, elev, name, status):
+    folium.CircleMarker(location=[lat,lon],
+                  popup= 'Name: '+name+'\n'+'Status: '+status+'\n'+'Elevation: ' + str(elev)+'m',
+                  fill_color=color_icon(elev),
+                  color='black',
+                  radius=5,
+                  fill_opacity=0.9,
+                  tooltip='Click for more info').add_to(marker_cluster)
+map.save('map2.html')
